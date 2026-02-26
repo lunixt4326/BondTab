@@ -1,0 +1,12 @@
+contracts/node_modules
+contracts/artifacts
+contracts/cache
+contracts/typechain-types
+web/node_modules
+web/dist
+web/.vercel
+.git
+*.md
+*.jpg
+.DS_Store
+Thumbs.db
