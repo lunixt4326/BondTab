@@ -5,7 +5,6 @@ import {
   Shield, Receipt, Users, CheckCircle, ArrowRight,
   Lock, Zap, Scale, DollarSign, Sparkles,
 } from 'lucide-react';
-import { useEffect } from 'react';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -27,11 +26,11 @@ export function Landing() {
   const { isConnected } = useAccount();
   const { connect, connectors } = useConnect();
 
-  useEffect(() => {
-    if (isConnected) navigate('/app');
-  }, [isConnected, navigate]);
-
   const handleConnect = () => {
+    if (isConnected) {
+      navigate('/app');
+      return;
+    }
     const injected = connectors.find((c) => c.id === 'injected' || c.name === 'MetaMask');
     if (injected) connect({ connector: injected });
     else if (connectors[0]) connect({ connector: connectors[0] });
@@ -62,7 +61,7 @@ export function Landing() {
             Features
           </a>
           <button onClick={handleConnect} className="btn-primary text-xs">
-            Connect Wallet
+            {isConnected ? 'Go to Dashboard' : 'Connect Wallet'}
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -131,7 +130,7 @@ export function Landing() {
               className="flex flex-wrap gap-3"
             >
               <button onClick={handleConnect} className="btn-primary group">
-                Launch App
+                {isConnected ? 'Go to Dashboard' : 'Launch App'}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
               <a href="#how-it-works" className="btn-secondary">
@@ -373,7 +372,7 @@ export function Landing() {
               Connect your wallet, create a group, and start splitting expenses backed by real USDC bonds.
             </p>
             <button onClick={handleConnect} className="btn-primary group">
-              Get Started
+              {isConnected ? 'Open Dashboard' : 'Get Started'}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
