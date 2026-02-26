@@ -15,8 +15,8 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Install only production server deps
-RUN npm init -y && npm install express compression
+# Install only production server deps (pin express@4 for stable wildcard routing)
+RUN npm init -y && npm install express@4 compression
 
 # Copy built assets and server
 COPY --from=builder /app/dist ./dist

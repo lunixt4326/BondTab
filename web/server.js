@@ -2,13 +2,9 @@
  * Production server for Railway.
  * Serves the Vite-built SPA from dist/ and exposes /api/pin for IPFS pinning.
  */
-import express from 'express';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import compression from 'compression';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const express = require('express');
+const { join } = require('path');
+const compression = require('compression');
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -67,7 +63,7 @@ const distPath = join(__dirname, 'dist');
 app.use(express.static(distPath, { maxAge: '1y', immutable: true }));
 
 // ── SPA fallback: all non-API routes serve index.html ──
-app.get('*', (_req, res) => {
+app.use((_req, res) => {
   res.sendFile(join(distPath, 'index.html'));
 });
 
