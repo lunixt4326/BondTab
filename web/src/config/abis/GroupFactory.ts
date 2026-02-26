@@ -1,0 +1,63 @@
+export const GROUP_FACTORY_ABI = [
+  {
+    type: 'event',
+    name: 'GroupCreated',
+    inputs: [
+      { name: 'groupAddress', type: 'address', indexed: true },
+      { name: 'expenseModule', type: 'address', indexed: true },
+      { name: 'disputeModule', type: 'address', indexed: true },
+      { name: 'name', type: 'string', indexed: false },
+      { name: 'creator', type: 'address', indexed: false },
+      { name: 'members', type: 'address[]', indexed: false },
+      { name: 'timestamp', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'function',
+    name: 'createGroup',
+    inputs: [
+      { name: '_name', type: 'string' },
+      { name: '_members', type: 'address[]' },
+      { name: '_challengeWindowSeconds', type: 'uint256' },
+      { name: '_minBondUSDC', type: 'uint256' },
+      { name: '_quorumBps', type: 'uint256' },
+      { name: '_settlementGracePeriodSeconds', type: 'uint256' },
+      { name: '_slashBps', type: 'uint256' },
+      { name: '_voteWindowSeconds', type: 'uint256' },
+    ],
+    outputs: [
+      { name: 'groupAddr', type: 'address' },
+      { name: 'expenseAddr', type: 'address' },
+      { name: 'disputeAddr', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getGroups',
+    inputs: [],
+    outputs: [{ type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getGroupCount',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getGroupsByMember',
+    inputs: [{ name: 'member', type: 'address' }],
+    outputs: [{ type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'allGroups',
+    inputs: [{ name: '', type: 'uint256' }],
+    outputs: [{ type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const;

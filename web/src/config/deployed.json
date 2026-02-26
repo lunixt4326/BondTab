@@ -1,0 +1,11 @@
+{
+  "chainId": 137,
+  "usdc": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+  "factory": "0x4427b7732AAD810F61c780E14FcB49e9Ec1C7686",
+  "groupImplementation": "0x78139f26808754e46e127a1E2875F68ad1A54FCa",
+  "expenseImplementation": "0xe3319C3D92B7BAe163B77C2d9bb85c3bAc5f4F57",
+  "disputeImplementation": "0x169F59E6592d600ccA367caE0166F511653F1591",
+  "reputationRegistry": "0xff6d914260fafaa7eEF544BdFD15b9B2632bcac2",
+  "deployBlock": 83512620,
+  "timestamp": 1772145271
+}

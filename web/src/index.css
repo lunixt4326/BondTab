@@ -1,0 +1,134 @@
+@import '@fontsource/space-grotesk/400.css';
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/space-grotesk/700.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-surface-950 text-neutral-200 font-body antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-600 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-surface-500;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-surface-800/60 backdrop-blur-xl border border-surface-600/40 rounded-xl shadow-sm;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 hover:bg-surface-800/80;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
+           bg-accent text-surface-950 font-display font-semibold text-sm
+           transition-all duration-200
+           hover:bg-accent-300 hover:shadow-lg hover:shadow-accent/20
+           active:scale-[0.98]
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
+           border border-surface-500 text-neutral-200 font-display font-medium text-sm
+           transition-all duration-200 bg-surface-800/50
+           hover:border-accent/40 hover:text-accent
+           active:scale-[0.98]
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
+           bg-danger/10 border border-danger/30 text-danger font-display font-medium text-sm
+           transition-all duration-200
+           hover:bg-danger/20 hover:border-danger/50
+           active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+           text-neutral-400 font-medium text-sm
+           transition-all duration-200
+           hover:text-neutral-200 hover:bg-surface-700/50
+           active:scale-[0.98];
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-lg
+           bg-surface-900 border border-surface-600/50 text-neutral-100
+           font-body text-sm placeholder:text-neutral-600
+           transition-all duration-200
+           focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20;
+  }
+
+  .label-text {
+    @apply block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-accent {
+    @apply badge bg-accent/10 text-accent border border-accent/20;
+  }
+
+  .badge-amber {
+    @apply badge bg-amber/10 text-amber border border-amber/20;
+  }
+
+  .badge-danger {
+    @apply badge bg-danger/10 text-danger border border-danger/20;
+  }
+
+  .badge-success {
+    @apply badge bg-success/10 text-success border border-success/20;
+  }
+
+  .skeleton {
+    @apply bg-surface-700/50 rounded animate-pulse;
+  }
+
+  .page-heading {
+    @apply font-display font-semibold text-lg text-neutral-100 tracking-tight;
+  }
+
+  .section-heading {
+    @apply font-display font-medium text-sm text-neutral-300 uppercase tracking-wider;
+  }
+}
