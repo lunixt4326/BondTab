@@ -279,7 +279,7 @@ export function Landing() {
       </section>
 
       {/* Features */}
-      <section id="features" className="max-w-6xl mx-auto px-6 py-24 border-t border-surface-800/50">
+      <section id="features" className="max-w-6xl mx-auto px-6 py-24 border-t border-surface-600/40">
         <div className="text-center mb-14">
           <motion.div
             initial={{ opacity: 0 }}
@@ -287,7 +287,7 @@ export function Landing() {
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-800/60 border border-surface-700/40 mb-4"
           >
-            <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">Features</span>
+            <span className="text-[10px] font-mono text-accent uppercase tracking-wider">Features</span>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
@@ -300,10 +300,10 @@ export function Landing() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            { icon: Shield, title: 'Bond-Backed', desc: 'Deposits guarantee good-faith participation', accent: 'group-hover:border-accent/40' },
-            { icon: Zap, title: 'One-Click Settle', desc: 'Computed net settlement in a single transaction', accent: 'group-hover:border-amber/40' },
-            { icon: DollarSign, title: 'Native USDC', desc: 'Real stablecoin on Polygon — no wrapped tokens', accent: 'group-hover:border-accent/40' },
-            { icon: Users, title: 'Group Governance', desc: 'Challenge expenses, vote on disputes, enforce rules', accent: 'group-hover:border-amber/40' },
+            { icon: Shield, title: 'Bond-Backed', desc: 'Deposits guarantee good-faith participation', accent: 'group-hover:border-accent/50' },
+            { icon: Zap, title: 'One-Click Settle', desc: 'Computed net settlement in a single transaction', accent: 'group-hover:border-amber/50' },
+            { icon: DollarSign, title: 'Native USDC', desc: 'Real stablecoin on Polygon — no wrapped tokens', accent: 'group-hover:border-accent/50' },
+            { icon: Users, title: 'Group Governance', desc: 'Challenge expenses, vote on disputes, enforce rules', accent: 'group-hover:border-amber/50' },
           ].map((item, i) => (
             <motion.div
               key={item.title}
@@ -312,33 +312,33 @@ export function Landing() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              className={`group p-5 rounded-xl bg-surface-800/30 border border-surface-700/30 transition-all duration-300 ${item.accent} hover:bg-surface-800/60`}
+              className={`group p-5 rounded-xl bg-surface-700/40 border border-surface-600/50 transition-all duration-300 ${item.accent} hover:bg-surface-700/70 hover:shadow-lg hover:shadow-accent/5`}
             >
-              <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <item.icon className="w-4.5 h-4.5 text-accent" />
+              <div className="w-9 h-9 rounded-lg bg-accent/15 border border-accent/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <item.icon className="w-4.5 h-4.5 text-accent drop-shadow-[0_0_4px_rgba(0,255,170,0.3)]" />
               </div>
-              <h4 className="font-display font-medium text-xs text-neutral-200 mb-1">{item.title}</h4>
-              <p className="text-[11px] text-neutral-500 leading-relaxed">{item.desc}</p>
+              <h4 className="font-display font-medium text-sm text-white mb-1">{item.title}</h4>
+              <p className="text-xs text-neutral-300 leading-relaxed">{item.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* Security */}
-      <section className="max-w-6xl mx-auto px-6 py-24 border-t border-surface-800/50">
+      <section className="max-w-6xl mx-auto px-6 py-24 border-t border-surface-600/40">
         <div className="max-w-lg mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <div className="w-14 h-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mx-auto mb-5">
-              <Shield className="w-7 h-7 text-accent" />
+            <div className="w-14 h-14 rounded-2xl bg-accent/15 border border-accent/30 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-accent/10">
+              <Shield className="w-7 h-7 text-accent drop-shadow-[0_0_6px_rgba(0,255,170,0.4)]" />
             </div>
             <h2 className="font-display font-semibold text-lg text-neutral-100 mb-3">
               Security First
             </h2>
-            <p className="text-xs text-neutral-400 leading-relaxed mb-6">
+            <p className="text-xs text-neutral-300 leading-relaxed mb-6">
               All funds are held in auditable smart contracts on Polygon.
               Receipt data is encrypted client-side before IPFS upload.
               Only onchain hashes verify integrity.
@@ -368,7 +368,7 @@ export function Landing() {
             <h2 className="font-display font-semibold text-lg text-neutral-100 mb-2">
               Ready to split expenses fairly?
             </h2>
-            <p className="text-xs text-neutral-400 mb-6 max-w-sm mx-auto">
+            <p className="text-xs text-neutral-300 mb-6 max-w-sm mx-auto">
               Connect your wallet, create a group, and start splitting expenses backed by real USDC bonds.
             </p>
             <button onClick={handleConnect} className="btn-primary group">
@@ -380,7 +380,7 @@ export function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="max-w-6xl mx-auto px-6 py-8 border-t border-surface-800/50">
+      <footer className="max-w-6xl mx-auto px-6 py-8 border-t border-surface-600/40">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 group">
             <img src="/logo.png" alt="" className="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity rounded" />
