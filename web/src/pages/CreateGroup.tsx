@@ -18,6 +18,7 @@ export function CreateGroup() {
   const [memberInput, setMemberInput] = useState('');
   const [members, setMembers] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const addMember = () => {
     const addr = memberInput.trim();
@@ -52,6 +53,7 @@ export function CreateGroup() {
     const bondWei = parseUSDC(bondAmount);
     const period = BigInt(challengePeriod);
 
+    setIsSubmitting(true);
     try {
       await createGroup({
         name: name.trim(),
@@ -66,8 +68,12 @@ export function CreateGroup() {
       navigate('/app');
     } catch {
       // Toast handles errors
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const busy = isCreating || isSubmitting;
 
   const shortenAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
@@ -206,11 +212,11 @@ export function CreateGroup() {
         )}
 
         {/* Submit */}
-        <button type="submit" disabled={isCreating} className="btn-primary w-full justify-center">
-          {isCreating ? (
+        <button type="submit" disabled={busy} className="btn-primary w-full justify-center">
+          {busy ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Creating…
+              {isCreating ? 'Confirm in wallet…' : 'Creating on-chain…'}
             </>
           ) : (
             <>

@@ -1,5 +1,5 @@
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { useAccount } from 'wagmi';
+import { useReadContract, useWriteContract } from 'wagmi';
+import { useAccount, usePublicClient } from 'wagmi';
 import { BOND_TAB_GROUP_ABI, ERC20_ABI } from '../config/abis';
 import { USDC_ADDRESS } from '../config/constants';
 import { addToast, updateToast } from '../components/Toast';
@@ -89,74 +89,85 @@ export function useGroup(groupAddress: `0x${string}` | undefined) {
   });
 
   // Separate writeContract instances to avoid race conditions (e.g., approve → deposit)
-  const { writeContract: writeApprove } = useWriteContract();
-  const { writeContract: writeDeposit } = useWriteContract();
-  const { writeContract: writeWithdraw } = useWriteContract();
-  const { writeContract: writeSettle } = useWriteContract();
+  const { writeContractAsync: writeApprove } = useWriteContract();
+  const { writeContractAsync: writeDeposit } = useWriteContract();
+  const { writeContractAsync: writeWithdraw } = useWriteContract();
+  const { writeContractAsync: writeSettle } = useWriteContract();
+  const publicClient = usePublicClient();
 
-  const approveUSDC = (amount: bigint) => {
+  const approveUSDC = async (amount: bigint) => {
     if (!groupAddress) return;
     const toastId = addToast({ type: 'pending', title: 'Approving USDC...' });
-    writeApprove({
-      address: USDC_ADDRESS,
-      abi: ERC20_ABI,
-      functionName: 'approve',
-      args: [groupAddress, amount],
-    }, {
-      onSuccess: (hash) => updateToast(toastId, { type: 'success', title: 'USDC approved', txHash: hash }),
-      onError: (err) => updateToast(toastId, { type: 'error', title: 'Approval failed', message: err.message.slice(0, 100) }),
-    });
+    try {
+      const hash = await writeApprove({
+        address: USDC_ADDRESS,
+        abi: ERC20_ABI,
+        functionName: 'approve',
+        args: [groupAddress, amount],
+      });
+      updateToast(toastId, { type: 'pending', title: 'Confirming approval...', txHash: hash });
+      await publicClient!.waitForTransactionReceipt({ hash, confirmations: 1 });
+      updateToast(toastId, { type: 'success', title: 'USDC approved', txHash: hash });
+    } catch (err: any) {
+      updateToast(toastId, { type: 'error', title: 'Approval failed', message: (err?.shortMessage || err?.message || '').slice(0, 100) });
+    }
   };
 
-  const depositBond = (amount: bigint) => {
+  const depositBond = async (amount: bigint) => {
     if (!groupAddress) return;
     const toastId = addToast({ type: 'pending', title: 'Depositing bond...' });
-    writeDeposit({
-      address: groupAddress,
-      abi: BOND_TAB_GROUP_ABI,
-      functionName: 'depositBond',
-      args: [amount],
-    }, {
-      onSuccess: (hash) => {
-        updateToast(toastId, { type: 'success', title: 'Bond deposited!', txHash: hash });
-        refetchBond();
-      },
-      onError: (err) => updateToast(toastId, { type: 'error', title: 'Deposit failed', message: err.message.slice(0, 100) }),
-    });
+    try {
+      const hash = await writeDeposit({
+        address: groupAddress,
+        abi: BOND_TAB_GROUP_ABI,
+        functionName: 'depositBond',
+        args: [amount],
+      });
+      updateToast(toastId, { type: 'pending', title: 'Confirming deposit...', txHash: hash });
+      await publicClient!.waitForTransactionReceipt({ hash, confirmations: 1 });
+      updateToast(toastId, { type: 'success', title: 'Bond deposited!', txHash: hash });
+      refetchBond();
+    } catch (err: any) {
+      updateToast(toastId, { type: 'error', title: 'Deposit failed', message: (err?.shortMessage || err?.message || '').slice(0, 100) });
+    }
   };
 
-  const withdrawBond = (amount: bigint) => {
+  const withdrawBond = async (amount: bigint) => {
     if (!groupAddress) return;
     const toastId = addToast({ type: 'pending', title: 'Withdrawing bond...' });
-    writeWithdraw({
-      address: groupAddress,
-      abi: BOND_TAB_GROUP_ABI,
-      functionName: 'withdrawBond',
-      args: [amount],
-    }, {
-      onSuccess: (hash) => {
-        updateToast(toastId, { type: 'success', title: 'Bond withdrawn!', txHash: hash });
-        refetchBond();
-      },
-      onError: (err) => updateToast(toastId, { type: 'error', title: 'Withdraw failed', message: err.message.slice(0, 100) }),
-    });
+    try {
+      const hash = await writeWithdraw({
+        address: groupAddress,
+        abi: BOND_TAB_GROUP_ABI,
+        functionName: 'withdrawBond',
+        args: [amount],
+      });
+      updateToast(toastId, { type: 'pending', title: 'Confirming withdrawal...', txHash: hash });
+      await publicClient!.waitForTransactionReceipt({ hash, confirmations: 1 });
+      updateToast(toastId, { type: 'success', title: 'Bond withdrawn!', txHash: hash });
+      refetchBond();
+    } catch (err: any) {
+      updateToast(toastId, { type: 'error', title: 'Withdraw failed', message: (err?.shortMessage || err?.message || '').slice(0, 100) });
+    }
   };
 
-  const settleBatch = (debtors: `0x${string}`[], creditors: `0x${string}`[], amounts: bigint[]) => {
+  const settleBatch = async (debtors: `0x${string}`[], creditors: `0x${string}`[], amounts: bigint[]) => {
     if (!groupAddress) return;
     const toastId = addToast({ type: 'pending', title: 'Executing settlement...' });
-    writeSettle({
-      address: groupAddress,
-      abi: BOND_TAB_GROUP_ABI,
-      functionName: 'settleBatch',
-      args: [debtors, creditors, amounts],
-    }, {
-      onSuccess: (hash) => {
-        updateToast(toastId, { type: 'success', title: 'Settlement complete!', txHash: hash });
-        refetchBalance();
-      },
-      onError: (err) => updateToast(toastId, { type: 'error', title: 'Settlement failed', message: err.message.slice(0, 100) }),
-    });
+    try {
+      const hash = await writeSettle({
+        address: groupAddress,
+        abi: BOND_TAB_GROUP_ABI,
+        functionName: 'settleBatch',
+        args: [debtors, creditors, amounts],
+      });
+      updateToast(toastId, { type: 'pending', title: 'Confirming settlement...', txHash: hash });
+      await publicClient!.waitForTransactionReceipt({ hash, confirmations: 1 });
+      updateToast(toastId, { type: 'success', title: 'Settlement complete!', txHash: hash });
+      refetchBalance();
+    } catch (err: any) {
+      updateToast(toastId, { type: 'error', title: 'Settlement failed', message: (err?.shortMessage || err?.message || '').slice(0, 100) });
+    }
   };
 
   return {

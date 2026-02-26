@@ -89,10 +89,10 @@ export function useExpenses(expenseModuleAddr: `0x${string}` | undefined) {
     fetchExpenses();
   }, [fetchExpenses]);
 
-  const { writeContract: writePropose } = useWriteContract();
-  const { writeContract: writeFinalize } = useWriteContract();
+  const { writeContractAsync: writePropose } = useWriteContract();
+  const { writeContractAsync: writeFinalize } = useWriteContract();
 
-  const proposeExpense = (params: {
+  const proposeExpense = async (params: {
     totalAmountUSDC: bigint;
     participants: `0x${string}`[];
     splits: bigint[];
@@ -102,43 +102,47 @@ export function useExpenses(expenseModuleAddr: `0x${string}` | undefined) {
   }) => {
     if (!expenseModuleAddr) return;
     const toastId = addToast({ type: 'pending', title: 'Submitting expense...' });
-    writePropose({
-      address: expenseModuleAddr,
-      abi: EXPENSE_MODULE_ABI,
-      functionName: 'proposeExpense',
-      args: [
-        params.totalAmountUSDC,
-        params.participants,
-        params.splits,
-        params.receiptHash,
-        params.metadataHash,
-        params.receiptCID,
-      ],
-    }, {
-      onSuccess: (hash) => {
-        updateToast(toastId, { type: 'success', title: 'Expense proposed!', txHash: hash });
-        refetchCount();
-        setTimeout(fetchExpenses, 3000);
-      },
-      onError: (err) => updateToast(toastId, { type: 'error', title: 'Failed to propose', message: err.message.slice(0, 100) }),
-    });
+    try {
+      const hash = await writePropose({
+        address: expenseModuleAddr,
+        abi: EXPENSE_MODULE_ABI,
+        functionName: 'proposeExpense',
+        args: [
+          params.totalAmountUSDC,
+          params.participants,
+          params.splits,
+          params.receiptHash,
+          params.metadataHash,
+          params.receiptCID,
+        ],
+      });
+      updateToast(toastId, { type: 'pending', title: 'Confirming expense...', txHash: hash });
+      await publicClient!.waitForTransactionReceipt({ hash, confirmations: 1 });
+      updateToast(toastId, { type: 'success', title: 'Expense proposed!', txHash: hash });
+      refetchCount();
+      fetchExpenses();
+    } catch (err: any) {
+      updateToast(toastId, { type: 'error', title: 'Failed to propose', message: (err?.shortMessage || err?.message || '').slice(0, 100) });
+    }
   };
 
-  const finalizeExpense = (expenseId: number) => {
+  const finalizeExpense = async (expenseId: number) => {
     if (!expenseModuleAddr) return;
     const toastId = addToast({ type: 'pending', title: 'Finalizing expense...' });
-    writeFinalize({
-      address: expenseModuleAddr,
-      abi: EXPENSE_MODULE_ABI,
-      functionName: 'finalizeExpense',
-      args: [BigInt(expenseId)],
-    }, {
-      onSuccess: (hash) => {
-        updateToast(toastId, { type: 'success', title: 'Expense finalized!', txHash: hash });
-        setTimeout(fetchExpenses, 3000);
-      },
-      onError: (err) => updateToast(toastId, { type: 'error', title: 'Finalize failed', message: err.message.slice(0, 100) }),
-    });
+    try {
+      const hash = await writeFinalize({
+        address: expenseModuleAddr,
+        abi: EXPENSE_MODULE_ABI,
+        functionName: 'finalizeExpense',
+        args: [BigInt(expenseId)],
+      });
+      updateToast(toastId, { type: 'pending', title: 'Confirming finalization...', txHash: hash });
+      await publicClient!.waitForTransactionReceipt({ hash, confirmations: 1 });
+      updateToast(toastId, { type: 'success', title: 'Expense finalized!', txHash: hash });
+      fetchExpenses();
+    } catch (err: any) {
+      updateToast(toastId, { type: 'error', title: 'Finalize failed', message: (err?.shortMessage || err?.message || '').slice(0, 100) });
+    }
   };
 
   return {

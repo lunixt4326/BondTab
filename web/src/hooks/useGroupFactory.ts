@@ -1,5 +1,5 @@
-import { useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { useAccount } from 'wagmi';
+import { useReadContract, useWriteContract } from 'wagmi';
+import { useAccount, usePublicClient } from 'wagmi';
 import { GROUP_FACTORY_ABI } from '../config/abis';
 import { FACTORY_ADDRESS } from '../config/constants';
 import { addToast, updateToast } from '../components/Toast';
@@ -22,8 +22,8 @@ export function useGroupFactory() {
     query: { enabled: !!FACTORY_ADDRESS },
   });
 
-  const { writeContract, data: txHash, isPending: isCreating } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const { writeContractAsync, isPending: isCreating } = useWriteContract();
+  const publicClient = usePublicClient();
 
   const createGroup = async (params: {
     name: string;
@@ -38,10 +38,10 @@ export function useGroupFactory() {
     const toastId = addToast({ type: 'pending', title: 'Creating group...' });
     if (!FACTORY_ADDRESS) {
       updateToast(toastId, { type: 'error', title: 'Contracts not deployed', message: 'Factory address not configured' });
-      return;
+      throw new Error('Factory address not configured');
     }
     try {
-      writeContract({
+      const hash = await writeContractAsync({
         address: FACTORY_ADDRESS,
         abi: GROUP_FACTORY_ABI,
         functionName: 'createGroup',
@@ -55,17 +55,19 @@ export function useGroupFactory() {
           params.slashBps,
           params.voteWindowSeconds,
         ],
-      }, {
-        onSuccess: (hash) => {
-          updateToast(toastId, { type: 'success', title: 'Group created!', txHash: hash });
-          refetchGroups();
-        },
-        onError: (err) => {
-          updateToast(toastId, { type: 'error', title: 'Failed to create group', message: err.message.slice(0, 100) });
-        },
       });
+
+      updateToast(toastId, { type: 'pending', title: 'Confirming on-chain...', txHash: hash });
+
+      await publicClient!.waitForTransactionReceipt({ hash, confirmations: 1 });
+
+      updateToast(toastId, { type: 'success', title: 'Group created!', txHash: hash });
+      await refetchGroups();
+      return hash;
     } catch (err: any) {
-      updateToast(toastId, { type: 'error', title: 'Transaction rejected' });
+      const msg = err?.shortMessage || err?.message?.slice(0, 100) || 'Transaction rejected';
+      updateToast(toastId, { type: 'error', title: 'Failed to create group', message: msg });
+      throw err;
     }
   };
 
@@ -74,9 +76,7 @@ export function useGroupFactory() {
     groupCount: groupCount ? Number(groupCount) : 0,
     groupsLoading,
     createGroup,
-    isCreating: isCreating || isConfirming,
-    isSuccess,
-    txHash,
+    isCreating,
     refetchGroups,
   };
 }
